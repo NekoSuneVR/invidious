@@ -1,16 +1,25 @@
 name: Build and release GitHub image
 
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "master"
+    paths-ignore:
+      - "*.md"
+      - LICENCE
+      - TRANSLATION
+      - invidious.service
+      - .git*
+      - .editorconfig
+      - screenshots/*
+      - .github/ISSUE_TEMPLATE/*
+      - kubernetes/**
 
 jobs:
   release:
     env:
-      REGISTRY: docker.io
-      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/invidious
+      REGISTRY: ghcr.io
+      IMAGE_NAME: nekosunevr/invidious
 
     permissions:
       contents: read

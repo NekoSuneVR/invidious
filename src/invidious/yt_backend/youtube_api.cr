@@ -421,7 +421,11 @@ module YoutubeAPI
   #    })
   #    ```
   #
-  def next(continuation : String, *, client_config : ClientConfig | Nil = nil)
+  def next(
+    continuation : String,
+    *,
+    client_config : ClientConfig | Nil = nil
+  )
     # JSON Request data, required by the API
     data = {
       "context"      => self.make_context(client_config),
@@ -432,18 +436,34 @@ module YoutubeAPI
   end
 
   # :ditto:
-  def next(data : Hash, *, client_config : ClientConfig | Nil = nil)
+  def next(
+    data : Hash,
+    *,
+    client_config : ClientConfig | Nil = nil,
+    use_po_token : Bool = false
+  )
     # JSON Request data, required by the API
     data2 = data.merge({
       "context" => self.make_context(client_config),
     })
 
+    if use_po_token
+      if video_id = self.extract_video_id(data)
+        self.attach_po_token(data2, video_id)
+      end
+    end
+
     return self._post_json("/youtubei/v1/next", data2, client_config)
   end
 
   # Allow a NamedTuple to be passed, too.
-  def next(data : NamedTuple, *, client_config : ClientConfig | Nil = nil)
-    return self.next(data.to_h, client_config: client_config)
+  def next(
+    data : NamedTuple,
+    *,
+    client_config : ClientConfig | Nil = nil,
+    use_po_token : Bool = false
+  )
+    return self.next(data.to_h, client_config: client_config, use_po_token: use_po_token)
   end
 
   ####################################################################
@@ -665,6 +685,36 @@ module YoutubeAPI
     rescue ex
       raise InfoException.new("Error while communicating with Invidious companion: " + (ex.message || "no extra info found"))
     end
+  end
+
+  private def extract_video_id(data : Hash) : String?
+    return nil unless data.has_key?("videoId")
+
+    value = data["videoId"]
+
+    case value
+    when JSON::Any
+      value.as_s?
+    when String
+      value
+    else
+      value.to_s
+    end
+  rescue
+    nil
+  end
+
+  private def attach_po_token(data : Hash, video_id : String)
+    token = PoToken.token_for(video_id)
+    return if token.nil? || token.empty?
+
+    data["playbackContext"] = {
+      "contentPlaybackContext" => {
+        "poToken" => token,
+      },
+    }
+  rescue ex
+    LOGGER.warn("YoutubeAPI: failed to attach po_token for #{video_id}: #{ex.message}")
   end
 
   ####################################################################

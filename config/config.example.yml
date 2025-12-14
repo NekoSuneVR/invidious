@@ -245,6 +245,25 @@ https_only: false
 ##
 # use_innertube_for_captions: false
 
+##
+## Optional endpoint used to fetch po_token values.
+## The service should expose a /get_pot endpoint that returns a JSON
+## payload containing "poToken" and "expiresAt".
+##
+## Accepted values: "http(s)://<IP-HOSTNAME>:<Port>[/get_pot]"
+## Default: <none>
+##
+#po_token_endpoint: http://localhost:4416/get_pot
+
+##
+## Template used to build the content binding sent to the po_token service.
+## The substring "%{video_id}" will be replaced with the requested video ID.
+##
+## Accepted values: any string containing "%{video_id}"
+## Default: https://www.youtube.com/watch?v=%{video_id}
+##
+#po_token_binding_template: https://www.youtube.com/shorts/%{video_id}
+
 # -----------------------------
 #  Logging
 # -----------------------------

@@ -167,6 +167,15 @@ class Config
   # Use Innertube's transcripts API instead of timedtext for closed captions
   property use_innertube_for_captions : Bool = false
 
+  # Optional endpoint used to retrieve po_token values
+  # Example: http://23.88.52.211:4416/get_pot
+  @[YAML::Field(converter: Preferences::URIConverter)]
+  property po_token_endpoint : URI = URI.parse("")
+
+  # Template used to build the content binding sent to the po_token service
+  # The substring "%{video_id}" will be replaced with the requested video ID.
+  property po_token_binding_template : String = "https://www.youtube.com/watch?v=%{video_id}"
+
   # Invidious companion
   property invidious_companion : Array(CompanionConfig) = [] of CompanionConfig
 

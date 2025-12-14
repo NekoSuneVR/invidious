@@ -8,6 +8,8 @@ module PoToken
     getter token : String
     getter expires_at : Time
     getter content_binding : String
+
+    def initialize(@token : String, @expires_at : Time, @content_binding : String); end
   end
 
   CACHE_BUFFER = 30.seconds

@@ -708,11 +708,10 @@ module YoutubeAPI
     token = PoToken.token_for(video_id)
     return if token.nil? || token.empty?
 
-    data["playbackContext"] = {
-      "contentPlaybackContext" => {
-        "poToken" => token,
-      },
+    playback_context = {
+      "contentPlaybackContext" => JSON::Any.new({"poToken" => JSON::Any.new(token)}),
     }
+    data["playbackContext"] = JSON::Any.new(playback_context)
   rescue ex
     LOGGER.warn("YoutubeAPI: failed to attach po_token for #{video_id}: #{ex.message}")
   end

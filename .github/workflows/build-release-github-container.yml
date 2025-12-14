@@ -1,4 +1,4 @@
-name: Build and release Docker Hub image
+name: Build and release GitHub image
 
 on:
   workflow_dispatch:
